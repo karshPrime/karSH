@@ -79,11 +79,19 @@ makefile() {
 }
 
 # Edit .git/config
-gignore() {
+gconfig() {
 	exit_if_not_git_repo || return
 	PROJECT_NAME=$(git rev-parse --show-toplevel)
 
 	open_file_if_exists "$PROJECT_NAME/.git/config"
+}
+
+# Edit .git/config
+gignore() {
+	exit_if_not_git_repo || return
+	PROJECT_NAME=$(git rev-parse --show-toplevel)
+
+	open_file_if_exists "$PROJECT_NAME/.gitignore"
 }
 
 # Edit main.x
