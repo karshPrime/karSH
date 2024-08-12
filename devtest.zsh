@@ -34,13 +34,14 @@
 
 # Path for project_initialise script
 PROJ_INIT="$HACK_SCRIPTS/project_initialise.sh"
+TEST_DIR="$HOME/Projects/.test"
 
 # Find the last test directory
 tst() {
 	# if argument is a number, check if that indexed test dir already exists
 	# if it does exist then move there
 	if [[ "$1" =~ ^[0-9]+$ ]]; then
-		target="/tmp/test${1}"
+		target="$TEST_DIR/test${1}"
 
 		if [ -d "$target" ]; then
 			cd "$target" || return
@@ -53,7 +54,7 @@ tst() {
 
 	# find existing biggest test<NUM> dir
 	highest=$(
-		find /tmp/ -maxdepth 1 -type d -name "test*" |
+		find "$TEST_DIR" -maxdepth 1 -type d -name "test*" |
 		grep -o '[0-9]*$' |
 		sort -n |
 		tail -1
@@ -70,22 +71,24 @@ tst() {
 	# trigger project init script
 	if [ -n "$1" ]; then
 		$PROJ_INIT "test${next}.$1"
-		mv "./test${next}" /tmp/
+		mv "./test${next}" "$TEST_DIR/."
 	else
-		mkdir "/tmp/test${next}"
+		mkdir "$TEST_DIR/test${next}"
 	fi
 
-	cd "/tmp/test${next}/"
+	cd "$TEST_DIR/test${next}/"
 }
 
-# Delete all test directies with self remove utility
+# Delete all test directories with self remove utility
 tstrm() {
+    setopt RM_STAR_SILENT
     local cwd=$(pwd)
 
-    if [[ $cwd == /tmp/test* ]]; then
+    if [[ $cwd == "$TEST_DIR"* ]]; then
         cd ~
     fi
 
-	rm -rf /tmp/test*
+	echo "Clearing test directories."
+	rm -rf "$TEST_DIR"/* > /dev/null 2>&1
 }
 
