@@ -140,23 +140,27 @@ vi() {
 			CONDITIONS=("${CONDITIONS[@]:0:${#CONDITIONS[@]}-1}")
 		fi
 		# find files based on constructed conditions, excluding .git directory
-		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path '*/.git/*')
+		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path '*/\.*/*')
 	else
-		FILES=$(find "." -type f -not -path '*/.git/*')
+		FILES=$(find "." -type f -not -path '*/\.*/*')
 	fi
 
 	# use fzf to select files, displaying with bat
 	local FILES_OPEN=$(
-		if [ "$term_width" -lt 100 ]; then
+		if [ "$term_width" -lt 126 ]; then
 			echo "$FILES" |
 			sort |
-			fzf -m --preview-window=down:70%:wrap \
-				--preview="bat --color=always --number {}"
+			fzf -m \
+				--preview-window=down:70%:wrap \
+				--preview='echo -e "$(basename {})" \
+					&& bat --color=always --number {}'
 		else
 			echo "$FILES" |
 			sort |
-			fzf -m --preview-window=right:50%:wrap \
-				--preview="bat --color=always --number {}"
+			fzf -m \
+				--preview-window=right:86:wrap \
+				--preview='echo -e "$(basename {})" \
+					&& bat --color=always --number {}'
 		fi
 	)
 	# Count the number of selected files
