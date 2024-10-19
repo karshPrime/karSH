@@ -170,7 +170,11 @@ vi() {
 	if [ -z "$FILES_OPEN" ]; then
 		echo "No files selected."
 	elif [ "$FILE_COUNT" -gt 1 ]; then
-		$EDITOR -O2 $(echo "$FILES_OPEN")
+        if [ "$term_width" -lt 126 ]; then
+            $EDITOR -o2 $(echo "$FILES_OPEN")
+        else
+            $EDITOR -O2 $(echo "$FILES_OPEN")
+        fi
 	else
 		$EDITOR $(echo "$FILES_OPEN")
 	fi
