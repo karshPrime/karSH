@@ -37,58 +37,76 @@ PROJ_INIT="$HACK_SCRIPTS/project_initialise.sh"
 TEST_DIR="$HOME/Projects/.test"
 
 # Find the last test directory
-tst() {
-	# if argument is a number, check if that indexed test dir already exists
-	# if it does exist then move there
-	if [[ "$1" =~ ^[0-9]+$ ]]; then
-		target="$TEST_DIR/test${1}"
+bench () {
+    # act locally, if first arg is .
+	if [[ "$1" == "." ]]
+	then
+		BENCHES="." 
+		shift
+	else
+		BENCHES=$PLAYGROUND 
+	fi
 
-		if [ -d "$target" ]; then
+    # if argument is a number, check if that indexed test dir already exists
+	# if it does exist then move there
+	if [[ "$1" =~ ^[0-9]+$ ]]
+	then
+		target="$BENCHES/bench$1" 
+		if [ -d "$target" ]
+		then
 			cd "$target" || return
 			return
 		else
 			echo "Directory $target does not exist."
 			return 1
 		fi
-    fi
+	fi
 
 	# find existing biggest test<NUM> dir
 	highest=$(
-		find "$TEST_DIR" -maxdepth 1 -type d -name "test*" |
-		grep -o '[0-9]*$' |
-		sort -n |
-		tail -1
-	)
+        find "$BENCHES" -maxdepth 1 -type d -name "bench*" |
+        grep -o '[0-9]*$' |
+        sort -n |
+        tail -1
+    ) 
 
 	# if no directory found, set the highest to 0
-	if [ -z "$highest" ]; then
-		highest=0
+	if [ -z "$highest" ]
+	then
+		highest=0 
 	fi
 
 	# increment the highest directory number
-	next=$((highest + 1))
-
-	# trigger project init script
-	if [ -n "$1" ]; then
-		$PROJ_INIT "test${next}.$1"
-		mv "./test${next}" "$TEST_DIR/."
+	next=$((highest + 1)) 
+	if [ -n "$1" ]
+	then
+		if ! "$PROJ_INIT" "bench$next.$1"
+		then
+			echo "Failed to initialize project."
+			return 1
+		fi
+		mv "./bench$next" "$BENCHES/." 2> /dev/null
 	else
-		mkdir "$TEST_DIR/test${next}"
+		mkdir "$BENCHES/bench$next"
 	fi
-
-	cd "$TEST_DIR/test${next}/"
+	cd "$BENCHES/bench$next/"
 }
 
 # Delete all test directories with self remove utility
-tstrm() {
-    setopt RM_STAR_SILENT
-    local cwd=$(pwd)
-
-    if [[ $cwd == "$TEST_DIR"* ]]; then
-        cd ~
-    fi
-
-	echo "Clearing test directories."
-	rm -rf "$TEST_DIR"/* > /dev/null 2>&1
+benchcl () {
+	setopt RM_STAR_SILENT
+	local cwd=$(pwd) 
+	if [[ "$1" == "." ]]
+	then
+		BENCHES="." 
+	else
+		BENCHES=$PLAYGROUND 
+	fi
+	if [[ $cwd == "$BENCHES"* ]]
+	then
+		cd ~
+	fi
+	echo "Clearing benches"
+	rm -rf "$BENCHES"/bench* > /dev/null 2>&1
 }
 
