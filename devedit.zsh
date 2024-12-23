@@ -140,7 +140,7 @@ vi() {
 			CONDITIONS=("${CONDITIONS[@]:0:${#CONDITIONS[@]}-1}")
 		fi
 		# find files based on constructed conditions, excluding .git directory
-		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path '*/\.*/*')
+		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path './build/*')
 	else
 		FILES=$(find "." -type f -not -path './build/*')
 	fi
