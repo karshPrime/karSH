@@ -39,14 +39,16 @@
 
 # helper functions -------------------------------------------------------------
 
-exit_if_not_git_repo() {
+# check if pwd is in a git repo
+alias isGit='
 	if ! git rev-parse --is-inside-work-tree &> /dev/null; then
 		echo -e "\e[31mError: \e[0mThis action requires the project to be within a git repo."
 		return 1
 	fi
-}
+'
 
-open_file_if_exists() {
+# open file if it Exists
+ve() {
 	if [ -f "$1" ]; then
 		$EDITOR "$1"
 	else
@@ -58,67 +60,67 @@ open_file_if_exists() {
 # calls ------------------------------------------------------------------------
 
 # Edit README
-readme() {
-	exit_if_not_git_repo || return
-	PROJECT_NAME=$(git rev-parse --show-toplevel)
-	README_FILE=$(ls "$PROJECT_NAME"/README* 2>/dev/null)
+alias readme='\
+	isGit;
+	PROJECT_NAME=$(git rev-parse --show-toplevel) &&
+	README_FILE=$(ls "$PROJECT_NAME"/README* 2>/dev/null) &&
 
 	if [ -z "$README_FILE" ]; then
 		echo -e "\e[31mError: \e[0mNo README file found."
 	else
-		open_file_if_exists "$README_FILE"
+		ve "$README_FILE"
 	fi
-}
+'
 
 # Edit Makefile
-makefile() {
-	exit_if_not_git_repo || return
-	PROJECT_NAME=$(git rev-parse --show-toplevel)
+alias makefile='
+	isGit;
+	PROJECT_NAME=$(git rev-parse --show-toplevel) &&
 
-	open_file_if_exists "$PROJECT_NAME/Makefile"
-}
-
-# Edit .git/config
-gconfig() {
-	exit_if_not_git_repo || return
-	PROJECT_NAME=$(git rev-parse --show-toplevel)
-
-	open_file_if_exists "$PROJECT_NAME/.git/config"
-}
+	ve "$PROJECT_NAME/Makefile"
+'
 
 # Edit .git/config
-gignore() {
-	exit_if_not_git_repo || return
-	PROJECT_NAME=$(git rev-parse --show-toplevel)
+alias gconfig='
+	isGit;
+	PROJECT_NAME=$(git rev-parse --show-toplevel) &&
 
-	open_file_if_exists "$PROJECT_NAME/.gitignore"
-}
+	ve "$PROJECT_NAME/.git/config"
+'
+
+# Edit .git/config
+alias gignore='
+	isGit;
+	PROJECT_NAME=$(git rev-parse --show-toplevel) &&
+
+	ve "$PROJECT_NAME/.gitignore"
+'
 
 # Edit main.x
-main() {
-	exit_if_not_git_repo || return
-	PROJECT_NAME=$(git rev-parse --show-toplevel)
+alias main='
+	isGit;
+	PROJECT_NAME=$(git rev-parse --show-toplevel) &&
 
-	MAIN_FILE=$(git ls-files "$PROJECT_NAME" | grep -i -E "main|index|init")
+	MAIN_FILE=$(git ls-files "$PROJECT_NAME" | grep -i -E "main|index|init") &&
 
 	if [ -z "$MAIN_FILE" ]; then
 		echo -e "\e[31mError: \e[0mNo main file found."
 	else
-		open_file_if_exists "$MAIN_FILE"
+		ve "$MAIN_FILE"
 	fi
-}
+'
 
 # cd to project root
-parent() {
-	exit_if_not_git_repo || return
-	PROJECT_NAME=$(git rev-parse --show-toplevel)
+alias parent='
+	isGit;
+	PROJECT_NAME=$(git rev-parse --show-toplevel) &&
 
 	cd "$PROJECT_NAME"
-}
+'
 
 # Vim Interactive
 vi() {
-	exit_if_not_git_repo || return
+	isGit;
 	pushd "$(git rev-parse --show-toplevel)" > /dev/null
 
 	local CONDITIONS=()
