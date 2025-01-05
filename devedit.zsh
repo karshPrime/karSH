@@ -1,15 +1,14 @@
 
-#- DevEdit ---------------------------------------------------------------------
+#- DevEdit -----------------------------------------------------------------------------------------
 #
-# ZSH plugin to quickly edit commonly used, language-agnostic files like
-# .gitignore, main.*, README, and more with a single command.
+# ZSH plugin to quickly edit commonly used, language-agnostic files like .gitignore, main.*, README,
+# and more with a single command.
 #
-# It simplifies development by abstracting away the details of file locations
-# or project structure, allowing you to focus on coding instead of navigating
-# directories.
+# It simplifies development by abstracting away the details of file locations or project structure,
+# allowing you to focus on coding instead of navigating directories.
 #
-# vi, short for vim interactive, extends the script further by using fzf and bat
-# to find all files of stated file extension.
+# vi, short for vim interactive, extends the script further by using fzf and bat to find all files
+# of stated file extension.
 #
 # example usage:
 # $ main
@@ -35,9 +34,9 @@
 # $ vi c .
 # [ list all .c files in current pwd with fzf, open selected ones in $EDITOR ]
 #
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
-# helper functions -------------------------------------------------------------
+# helper functions ---------------------------------------------------------------------------------
 
 # check if pwd is in a git repo
 alias isGit='
@@ -57,7 +56,7 @@ ve() {
 }
 
 
-# calls ------------------------------------------------------------------------
+# calls --------------------------------------------------------------------------------------------
 
 # Edit README
 alias readme='\
@@ -142,9 +141,9 @@ vi() {
 			CONDITIONS=("${CONDITIONS[@]:0:${#CONDITIONS[@]}-1}")
 		fi
 		# find files based on constructed conditions, excluding .git directory
-		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path './build/*')
+		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path './build/*' -not -path '**/.*')
 	else
-		FILES=$(find "." -type f -not -path './build/*')
+		FILES=$(find "." -type f -not -path './build/*' -not -path '**/.*')
 	fi
 
 	# use fzf to select files, displaying with bat
