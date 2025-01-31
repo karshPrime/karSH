@@ -41,17 +41,16 @@ bench () {
     # act locally, if first arg is .
 	if [[ "$1" == "." ]]
 	then
-		BENCHES="."
 		shift
 	else
-		BENCHES=$PLAYGROUND
+		cd $PLAYGROUND
 	fi
 
     # if argument is a number, check if that indexed test dir already exists
 	# if it does exist then move there
 	if [[ "$1" =~ ^[0-9]+$ ]]
 	then
-		target="$BENCHES/bench$1"
+		target="./bench$1"
 		if [ -d "$target" ]
 		then
 			cd "$target" || return
@@ -64,7 +63,7 @@ bench () {
 
 	# find existing biggest test<NUM> dir
 	highest=$(
-        find "$BENCHES" -maxdepth 1 -type d -name "bench*" |
+        find . -maxdepth 1 -type d -name "bench*" |
         grep -o '[0-9]*$' |
         sort -n |
         tail -1
@@ -85,11 +84,11 @@ bench () {
 			echo "Failed to initialize project."
 			return 1
 		fi
-		mv "./bench$next" "$BENCHES/." 2> /dev/null
 	else
-		mkdir "$BENCHES/bench$next"
+		mkdir "./bench$next"
 	fi
-	cd "$BENCHES/bench$next/"
+
+	cd "./bench$next/"
 }
 
 # Delete all test directories with self remove utility
