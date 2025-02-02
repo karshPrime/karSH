@@ -123,6 +123,8 @@ vi() {
 	pushd "$(git rev-parse --show-toplevel)" > /dev/null
 
 	local CONDITIONS=()
+    local DIRS=()
+    local FILES=""
 	local term_width=$(tput cols)
 
 	# construct find conditions based on arguments
@@ -130,6 +132,9 @@ vi() {
 		if [ "$ARG" = "." ]; then
 			popd > /dev/null
 			pushd . > /dev/null
+            DIRS+=(".")
+        elif [[ $ARG == .* ]]; then
+            DIRS+=( "$ARG" )
 		else
 			CONDITIONS+=("-iname" "*.$ARG" "-o")
 		fi
@@ -140,10 +145,15 @@ vi() {
 		if [ "${CONDITIONS[-1]}" = "-o" ]; then
 			CONDITIONS=("${CONDITIONS[@]:0:${#CONDITIONS[@]}-1}")
 		fi
-		# find files based on constructed conditions, excluding .git directory
-		FILES=$(find "." -type f \( "${CONDITIONS[@]}" \) -not -path './build/*' -not -path '**/.*')
+
+        for dir in "${DIRS[@]}"; do
+		    # find files based on constructed conditions, excluding .git directory
+		    FILES+=$(find "$dir" -type f \( "${CONDITIONS[@]}" \) -not -path './build/*' -not -path '**/.*')
+        done
 	else
-		FILES=$(find "." -type f -not -path './build/*' -not -path '**/.*')
+        for dir in "${DIRS[@]}"; do
+		    FILES+=$(find "$dir" -type f -not -path './build/*' -not -path '**/.*')
+        done
 	fi
 
 	# use fzf to select files, displaying with bat
