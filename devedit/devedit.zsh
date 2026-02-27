@@ -122,7 +122,7 @@ vi() {
 	local CONDITIONS=()
     local DIRS=()
     local FILES=""
-	local term_width=$(tput cols 2>/dev/null || echo 0)
+	local term_width=$(stty -a | grep rows | cut -f 6 -d ' ')
 
 	# construct find conditions based on arguments
 	for ARG in "$@"; do
